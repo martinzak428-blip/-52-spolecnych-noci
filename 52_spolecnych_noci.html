@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17121d">
+<title>52 společných nocí</title>
+<style>
+:root{color-scheme:dark;--bg:#17121d;--panel:#241c2b;--panel2:#302438;--text:#fff8f4;--muted:#c6b7c7;--pink:#ed7b9c;--line:#49384c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#38243b 0,#17121d 58%);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+main{max-width:620px;margin:auto;padding:24px 17px 42px}
+header{text-align:center;padding:18px 8px 22px}header .moon{font-size:42px}h1{font-size:30px;line-height:1.1;margin:8px 0}header p{color:var(--muted);margin:8px 0}
+.panel{background:rgba(36,28,43,.94);border:1px solid var(--line);border-radius:20px;padding:18px;margin:13px 0;box-shadow:0 12px 35px #0003}
+label{display:block;font-size:14px;color:var(--muted);margin-bottom:5px}input{width:100%;background:#17121d;border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font:inherit;min-width:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+button{font:inherit;font-weight:650;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 10px;min-height:46px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+button.primary{background:var(--pink);border-color:var(--pink);color:#26131c}
+button.selected{border-color:var(--pink);box-shadow:inset 0 0 0 1px var(--pink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+small,.muted{color:var(--muted)}.muted{font-size:13px}
+.full{width:100%}
+.gamehead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.pill{background:#17121d;border:1px solid var(--line);border-radius:30px;padding:6px 10px}
+.progress{height:7px;background:#49384c;border-radius:9px;overflow:hidden;margin:12px 0 17px}.bar{height:100%;width:0;background:var(--pink);transition:width .2s}
+.card{background:linear-gradient(145deg,#39283e,#211a29);border:1px solid #62445d;border-radius:20px;padding:26px 18px;text-align:center;min-height:225px;display:flex;flex-direction:column;justify-content:center;gap:14px;margin:12px 0}
+.category{font-size:12px;letter-spacing:1.5px;color:#f5a6bd;font-weight:750}.task{font-size:22px;font-weight:750;line-height:1.3}.hint{font-size:13px;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.notice{background:#17121d;border-radius:12px;padding:12px;font-size:13px;color:var(--muted)}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:10px}
+@media(max-width:360px){h1{font-size:26px}.task{font-size:20px}.levels{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="moon">🌙 ❤️</div><h1>52 společných nocí</h1><p>Dva lidé. Jeden večer. Spousta malých překvapení.</p></header>
+<section class="panel" id="setup">
+  <h2 style="margin:0 0 14px;font-size:19px">Připravte si večer</h2>
+  <div class="row">
+    <div><label for="player1">Hráč 1</label><input id="player1" maxlength="24" value="Já"></div>
+    <div><label for="player2">Hráč 2</label><input id="player2" maxlength="24" value="Partner/ka"></div>
+  </div>
+  <h3 style="font-size:15px;margin:18px 0 4px">Vyberte intenzitu</h3>
+  <div class="levels">
+    <button class="level selected" data-level="1">❤️ Jemná</button>
+    <button class="level" data-level="2">🔥 Odvážná</button>
+    <button class="level" data-level="3">😈 Intenzivní</button>
+  </div>
+  <p class="muted" id="levelDescription">Romantika, blízkost a vzájemné poznávání.</p>
+  <button class="primary full" id="start">Začít dnešní večer 🌙</button>
+</section>
+<section class="panel hidden" id="game">
+  <div class="gamehead"><span class="pill" id="nightLabel">NOC 1 / 52</span><span class="pill" id="turnLabel">Na tahu: Já</span></div>
+  <div class="gamehead" style="margin-top:12px"><span>Postup večera</span><span id="count">0 / 5 karet</span></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="card" aria-live="polite">
+    <div class="category" id="category">❤️ ROMANTIKA</div>
+    <div class="task" id="task">Připravte se na společný večer.</div>
+    <div class="hint" id="hint">Každý úkol můžete přeskočit.</div>
+  </div>
+  <div class="actions">
+    <button id="skip">Přeskočit ↪</button>
+    <button class="primary" id="done">Splněno ✓</button>
+  </div>
+  <p class="notice" id="status" aria-live="polite">Po každé kartě se vystřídáte. Čeká vás pět karet.</p>
+  <button class="full hidden" id="next">Další karta</button>
+  <button class="full" id="end" style="margin-top:9px">Ukončit večer</button>
+</section>
+<section class="panel">
+  <h3 style="margin:0 0 8px;font-size:17px">Pravidla</h3>
+  <p class="muted" style="margin:0">Střídáte se v plnění úkolů. Každý může kartu bez vysvětlování přeskočit. STOP znamená okamžité ukončení aktivity. Intenzitu můžete kdykoliv snížit. Cílem je společný zážitek, ne soutěž.</p>
+</section>
+<footer>Hra je určena dospělým partnerům. Respekt a dobrovolnost jsou vždy na prvním místě.</footer>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+let level=1,night=1,turn=0,drawn=0,deck=[],started=false;
+const descriptions={1:"Romantika, blízkost a vzájemné poznávání.",2:"Flirt, polibky a osobnější otázky.",3:"Smysly, fantazie a intimnější blízkost."};
+const cards={
+1:[
+["Romantika","Dejte si minutu dlouhé objetí a zkuste si ho opravdu užít."],
+["Poznávání","Řekni tři věci, které na druhém obdivuješ."],
+["Blízkost","Dívejte se jeden druhému minutu do očí."],
+["Vzpomínky","Popiš svůj nejoblíbenější společný okamžik."],
+["Dotek","Dopřej druhému tříminutovou masáž rukou."],
+["Otázka","Kdy ses se mnou cítil/a nejšťastnější?"],
+["Romantika","Zatančete si spolu na jednu pomalou písničku."],
+["Překvapení","Vymysli malé překvapení na příští společný den."],
+["Přiznání","Co bys chtěl/a, abych o tobě lépe chápal/a?"],
+["Blízkost","Polib druhého na místo, které si sám vybere."],
+["Rande","Naplánujte si společné rande, které nebude stát skoro nic."],
+["Vděčnost","Každý řekněte jednu věc, za kterou jste dnes vděční."]
+],
+2:[
+["Flirt","Po dobu 30 sekund druhého sváděj pouze pohledem."],
+["Výzva","Pošeptej druhému něco, co na něm považuješ za přitažlivé."],
+["Dotek","Zavři oči a nech druhého, aby tě jemně pohladil po tváři."],
+["Přiznání","Řekni jednu svou romantickou nebo intimní fantazii."],
+["Polibek","Dejte si dlouhý polibek, pokud to oběma vyhovuje."],
+["Hra","Jeden si vybere místo na ruce nebo rameni, druhý ho políbí."],
+["Masáž","Věnuj druhému pět minut příjemné masáže zad."],
+["Otázka","Co bys chtěl/a někdy společně vyzkoušet?"],
+["Flirt","Vymysli druhému tajnou přezdívku a vysvětli proč."],
+["Blízkost","Sedněte si těsně vedle sebe a řekněte si, co vám dnes chybělo."],
+["Přitažlivost","Každý řekněte, co vás na druhém nejvíc přitahuje."],
+["Odvaha","Zeptejte se jeden druhého na něco, na co jste se dosud neodvážili."]
+],
+3:[
+["Fantazie","Popiš romantický večer, který by sis chtěl/a se mnou užít."],
+["Vedení","Jeden vybere hudbu a druhý vede společný pomalý tanec."],
+["Smysly","Zavři oči a hádej, jaký jemný dotek druhý zvolil na tvé ruce."],
+["Přání","Řekni jedno přání týkající se vaší intimity."],
+["Masáž","Připravte si olej nebo krém a dopřejte si vzájemnou masáž."],
+["Výzva","Věnujte si chvíli líbání, pokud to oba chcete."],
+["Důvěra","Řekni, co ti pomáhá cítit se při intimitě bezpečně."],
+["Fantazie","Vymyslete společně novou podobu vašeho ideálního rande."],
+["Překvapení","Druhý může vybrat příjemný dotek na ruce, ramenou nebo zádech."],
+["Přiznání","Co bys chtěl/a, abychom v našem vztahu dělali častěji?"],
+["Blízkost","Řekněte si, co vám pomáhá uvolnit se a cítit se žádoucí."],
+["Společné přání","Každý navrhněte jednu novou věc, kterou byste chtěli někdy společně zažít."]
+]};
+const themes=["Večer vzpomínek","Tajemství mezi námi","Večer doteků","Rande jako poprvé","Bez telefonů","Večer přání","Oči jen pro tebe","Malá dobrodružství","Večer důvěry","Překvapení pro dva","Večer komplimentů","Noc plná fantazie","Společné sny"];
+function names(){return [ $("player1").value.trim()||"Hráč 1",$("player2").value.trim()||"Hráč 2"];}
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function update(){let n=names();$("nightLabel").textContent=`NOC ${night} / 52 · ${themes[(night-1)%themes.length]}`;$("turnLabel").textContent="Na tahu: "+n[turn];$("count").textContent=`${drawn} / 5 karet`;$("bar").style.width=(drawn*20)+"%";}
+function showCard(){if(drawn>=5){$("category").textContent="🌙 VEČER DOKONČEN";$("task").textContent="Dnešní večer patří jen vám dvěma. ❤️";$("hint").textContent="Užijte si zbytek večera po svém.";$("done").classList.add("hidden");$("skip").classList.add("hidden");$("next").classList.add("hidden");$("status").textContent="Pět karet máte za sebou. Můžete večer ukončit.";update();return;}
+if(!deck.length)deck=shuffle(cards[level]);let c=deck.pop();$("category").textContent="✨ "+c[0].toUpperCase();$("task").textContent=c[1];$("hint").textContent=`Karta ${drawn+1} z 5 · Kdykoliv můžete říct STOP.`;$("done").classList.remove("hidden");$("skip").classList.remove("hidden");$("next").classList.add("hidden");update();}
+function advance(){if(!started||drawn>=5)return;drawn++;turn=1-turn;$("status").textContent="Karta uzavřena. Teď je řada na druhém hráči.";showCard();}
+document.querySelectorAll(".level").forEach(b=>b.addEventListener("click",()=>{level=Number(b.dataset.level);document.querySelectorAll(".level").forEach(x=>x.classList.toggle("selected",x===b));$("levelDescription").textContent=descriptions[level];}));
+$("start").addEventListener("click",()=>{started=true;drawn=0;turn=0;deck=[];$("game").classList.remove("hidden");$("status").textContent="Pět karet, střídání hráčů a žádný tlak.";showCard();$("game").scrollIntoView({behavior:"smooth",block:"start"});});
+$("done").addEventListener("click",advance);$("skip").addEventListener("click",()=>{if(!started||drawn>=5)return;$("status").textContent="Karta přeskočena bez vysvětlování.";advance();});
+$("next").addEventListener("click",showCard);
+$("end").addEventListener("click",()=>{started=false;$("game").classList.add("hidden");night=night===52?1:night+1;$("start").textContent=`Začít noc ${night} 🌙`;$("setup").scrollIntoView({behavior:"smooth",block:"start"});});
+})();
+</script>
+</body>
+</html>
